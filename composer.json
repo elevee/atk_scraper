@@ -1,0 +1,6 @@
+{
+    "require": {
+        "fabpot/goutte": "*",
+        "phpcasperjs/phpcasperjs": "^1.3"
+    }
+}

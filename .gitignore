@@ -1,0 +1,6 @@
+vendor
+.DS_Store
+node_modules
+env.js
+*.mp4
+*.ts
