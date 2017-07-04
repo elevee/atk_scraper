@@ -7,9 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "casperjs": "1.1.4",
+    "cheerio-req": "^1.1.4",
+    "evernote": "^2.0.1-beta",
     "ffmpeg": "0.0.4",
-    "phantomjs": "2.1.7",
-    "casperjs": "1.1.4"
+    "phantomjs": "^2"
   },
   "repository": {
     "type": "git",

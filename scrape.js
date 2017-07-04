@@ -1,7 +1,24 @@
-var ffmpeg = require('ffmpeg');
-// var utils  = require('utils');
 // var path   = require('path');
-var ENV   =  require('./env.js');
+// var utils  = require('util');
+var ffmpeg = require('ffmpeg');
+var ENV   =  require('./env');
+var evernote = require('./scrape_node');
+
+// evernote.testFunc({title: "test title!"});
+var developerToken = ENV["EVERNOTE_DEV_TOKEN"]; //https://sandbox.evernote.com/shard/s1/notestore
+var Evernote = require('evernote');
+var client = new Evernote.Client({
+  token: developerToken, 
+  sandbox: false, 
+  china: false
+});
+var noteStore = client.getNoteStore();
+noteStore.listNotebooks().then(function(notebooks){
+  for (var i in notebooks) {
+    console.log("Notebook: " + notebooks[i].name);
+  }
+});
+
 var casper = require('casper').create({
 	viewportSize: {
 	    width: 1600,
@@ -16,6 +33,9 @@ var url = "https://www.americastestkitchen.com/recipes/9067-scallion-pancakes-wi
 var uri = "https://cdnapisec.kaltura.com/p/1445801/sp/144580100/playManifest/entryId/1_oighttmp/flavorIds/1_hoesme8n,1_nlql2grc,1_w58zor1a,1_0p8idx5h/format/applehttp/protocol/https/a.m3u8?referrer=aHR0cHM6Ly93d3cuYW1lcmljYXN0ZXN0a2l0Y2hlbi5jb20=&amp;playSessionId=4f5021b7-249e-fa28-12b9-ab0d0a522439&amp;clientTag=html5:v2.53.2&amp;uiConfId=35515711";
 
 function loggedIn(casper){
+	console.log("We are so ");
+	console.log(!casper.visible(".login-link") ? "" : "not");
+	console.log(" logged in.\n");
 	return !casper.visible(".login-link");
 }
 
@@ -57,10 +77,10 @@ casper.start(url, function(){
 		this.echo("Detail intro loaded.\n");
 		// this.echo(ENV["ATK_USER"]);
 		this.echo("Logged In?   ");
-		this.echo(loggedIn(this));
 		if(!loggedIn(this)){ 
 			logIn(this);
 		} else {
+			console.log("We're logged in.");
 			createRecipe(this);
 		}
 	});
@@ -71,17 +91,39 @@ casper.start(url, function(){
 // });
 
 function createRecipe(casper){
+	var note = {};
 	casper.then(function(){
+		note.title = this.fetchText('.detail__header--text');
+		note.body = "";
+		if (this.exists('.detail__content')) {
+			note.body += this.fetchText('.detail__content');
+			note.body += "<hr></br>";
+		}
+		if (this.exists('.recipe__ingredients')) {
+			note.body += this.fetchText('.recipe__ingredients');
+			note.body += "<hr></br>";
+		}
+		if (this.exists('.recipe__instructions')) {
+			note.body += this.fetchText('.recipe__instructions');
+			note.body += "<hr></br>";
+		}
 		if (this.exists('.detail__image--action')) {  //a.detail__image--action
 			this.echo("Video available!\n");
-			
+
 		} else {
 			this.echo("Nope. No Video.\n");
 		}
+		// console.log(note.title);
+		// console.log(note.body);
+		// makeNote();
+		// console.log(evernote.testFunc);
+		// evernote.testFunc(note);
+		
 	});
 }
 
-casper.run();
+casper.run();	
+
 
 // try {
 // 	var process = new ffmpeg(uri);
